@@ -385,8 +385,38 @@ Sau khi build project thành công, gõ lệnh này để đóng gói file khở
 ```bash
 petalinux-package --boot --force --u-boot
 ```
+chmode 777 images/
+su
 
 Sau đó cắm SD card vào PC, tiến hàn phân vùng và định dạng thẻ nhớ SD. **Bạn có thể làm theo hướng dẫn chi tiết trong Video hướng dẫn bên trên ** từ phút **53:40 đến 1:03:18** tại link bên dưới:
+
+fdisk /dev/sda
+n enter enter enter enter(y)
+n enter enter enter enter(y)
+sudo mkfs.vfat -F 32 -n boot /dev/sda1
+sudo mkfs.ext4 -L root /dev/sda2
+mkdir /mnt/boot
+mkdir /mnt/root
+mount /dev/sda1 /mnt/boot/
+mount /dev/sda2 /mnt/root
+exit
+ls
+cp boot.scr Image system.dtb system-zynqmp-sck-kv-g-revB.dtb ramdisk.cpio.gz.u-boot /mnt/boot/
+tar xfvp ..bullseye.tar -C /mnt/root/
+exit
+dd bs=64 skip=1 if=rootfs.cpio.gz.u-boot of=ramdisk.cpio.gz
+mkdir ramdisk && cd ramdisk 
+ls
+chmod 777 -R ../ramdisk
+su
+cpio -i -F ../ramdisk.cpio
+exit
+chmod 777 ../ramdisk.cpio
+su 
+cpio -i -F ../ramdisk.cpio
+ls
+cp -rvf lib/modules /mnt/root/lib/
+umount /dev/sda1 /dev/sda2
 
 📥 [Tải file Debian rootfs tại đây](https://drive.google.com/file/d/1ZcJYuVHpn8ER11nLCjwCUjfc5ykqP0tM/view?usp=sharing)
 
